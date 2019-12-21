@@ -1,0 +1,204 @@
+Given a binary tree, return the level order traversal of its nodes' values. (ie, from left to right, level by level).
+
+For example:
+Given binary tree [3,9,20,null,null,15,7],
+    3
+   / \
+  9  20
+    /  \
+   15   7
+return its level order traversal as:
+[
+  [3],
+  [9,20],
+  [15,7]
+]
+
+Solution:
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def levelOrder(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[List[int]]
+        """
+        if root == None:
+            return
+        queue = [(root,0)]
+        result = []
+        curr_level = []
+        prev_level = 0
+        
+        
+        while len(queue) > 0:
+            node,level = queue.pop(0)
+            if node == None:
+                continue
+            if level > prev_level:
+                result.append(curr_level[:])
+                curr_level = []
+                prev_level = level
+            curr_level.append(node.val)
+            queue.append((node.left, level + 1))
+            queue.append((node.right, level + 1))
+        
+        if root != None:
+            result.append(curr_level[:])
+  
+        return(result)
+
+Given a binary tree, return the zigzag level order traversal of its nodes' values. (ie, from left to right, then right to left for the next level and alternate between).
+
+For example:
+Given binary tree [3,9,20,null,null,15,7],
+    3
+   / \
+  9  20
+    /  \
+   15   7
+return its zigzag level order traversal as:
+[
+  [3],
+  [20,9],
+  [15,7]
+]
+
+Solution:
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def zigzagLevelOrder(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[List[int]]
+        """
+        if root == None:
+            return
+        queue = [(root,0)]
+        result = []
+        curr_level = []
+        prev_level = 0
+        ctr = 1
+        
+        while len(queue) > 0:
+            node,level = queue.pop(0)
+            if node == None:
+                continue
+            if level > prev_level:
+                if ctr % 2 == 0:
+                    result.append(curr_level[::-1])
+                else:
+                    result.append(curr_level[:])
+                curr_level = []
+                prev_level = level
+                ctr += 1
+            curr_level.append(node.val)
+            queue.append((node.left, level + 1))
+            queue.append((node.right, level + 1))
+        
+        if root != None and ctr % 2 == 0:
+            result.append(curr_level[::-1])
+        else:
+            result.append(curr_level[:])
+  
+        return(result)
+
+Given preorder and inorder traversal of a tree, construct the binary tree.
+
+Note:
+You may assume that duplicates do not exist in the tree.
+
+For example, given
+
+preorder = [3,9,20,15,7]
+inorder = [9,3,15,20,7]
+Return the following binary tree:
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+
+Solution:
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def buildTree(self, preorder, inorder):
+        """
+        :type preorder: List[int]
+        :type inorder: List[int]
+        :rtype: TreeNode
+        """
+        if len(preorder) == 0:
+            return None
+        # first element in predorder is root, then find the root index in inorder
+        # whatever comes before root in inorder is left subtree
+        # whatever comes after root in inorder is right subtree
+        # do this recirsively 
+        root = TreeNode(preorder[0])
+        inorder_root_idx = inorder.index(preorder[0])
+        left_len = inorder_root_idx
+        root.left = self.buildTree(preorder[1:(1+left_len)], inorder[0:inorder_root_idx])
+        root.right = self.buildTree(preorder[1+left_len:], inorder[inorder_root_idx+1:])
+        return(root)
+
+Given inorder and postorder traversal of a tree, construct the binary tree.
+
+Note:
+You may assume that duplicates do not exist in the tree.
+
+For example, given
+
+inorder = [9,3,15,20,7]
+postorder = [9,15,7,20,3]
+Return the following binary tree:
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+
+Solution:
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def buildTree(self, inorder, postorder):
+        """
+        :type inorder: List[int]
+        :type postorder: List[int]
+        :rtype: TreeNode
+        """
+        if len(postorder) == 0:
+            return None
+        root = TreeNode(postorder[len(postorder) - 1])
+        inorder_root_idx = inorder.index(postorder[-1])
+        root.left = self.buildTree(inorder[0:inorder_root_idx],postorder[:inorder_root_idx])
+        root.right = self.buildTree( inorder[inorder_root_idx+1:],postorder[inorder_root_idx:-1])
+        return(root)    
